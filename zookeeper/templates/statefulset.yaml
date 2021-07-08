@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: {{ template "fullname" . }}
+spec:
+{{- if .Values.podManagementPolicy }}
+  podManagementPolicy: {{ .Values.podManagementPolicy }}
+{{- end }}
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}
+  serviceName: {{ if .Values.serviceName -}} {{ .serviceName }} {{- else -}} {{ template "fullname" . }} {{- end }}
+  template:
+    metadata:
+{{- if .Values.podAnnotations }}
+      annotations:
+{{ toYaml .Values.podAnnotations | indent 8 }}
+{{- end }}
+      labels:
+        app: {{ template "fullname" . }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    spec:
+      containers:
+      - image: {{ .Values.image }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        name: {{ template "fullname" . }}
+        env:
+{{- range $pkey, $pval := .Values.env }}
+        - name: {{ $pkey }}
+          value: {{ quote $pval }}
+{{- end }}
+        ports:
+        - containerPort: {{ .Values.config.clientPort }}
+          name: tcp-clientport
+          protocol: TCP
+        - containerPort: 2888
+          name: tcp-inner
+          protocol: TCP
+        - containerPort: 3888
+          name: tcp-leader
+          protocol: TCP
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: {}
+          privileged: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+        stdin: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        tty: true
+        volumeMounts:
+        - mountPath: {{ .Values.config.path }}
+          name: config
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 256
+          items:
+          - key: zoo.cfg
+            path: zoo.cfg
+          name: {{ template "fullname" . }}-configmap
+          optional: false
+        name: config
+  updateStrategy:
+    type: RollingUpdate

@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" . }}-configmap
+data:
+  zoo.cfg: |-
+    # The number of milliseconds of each tick
+    tickTime={{.Values.config.tickTime}}
+    # The number of ticks that the initial 
+    # synchronization phase can take
+    initLimit={{.Values.config.initLimit}}
+    # The number of ticks that can pass between 
+    # sending a request and getting an acknowledgement
+    syncLimit={{.Values.config.syncLimit}}
+    # the directory where the snapshot is stored.
+    dataDir=/tmp/zookeeper
+    # the port at which the clients will connect
+    clientPort={{.Values.config.clientPort}}
+{{- if .Values.config.maxClientCnxns }}
+    # the maximum number of client connections.
+    # increase this if you need to handle more clients
+    maxClientCnxns={{ .Values.config.maxClientCnxns }}
+{{- end }}
+{{- if .Values.config.autopurge }}
+{{- if .Values.config.autopurge.snapRetainCount }}
+    # The number of snapshots to retain in dataDir
+    autopurge.snapRetainCount={{ .Values.config.autopurge.snapRetainCount }}
+{{- end}}
+{{- if  or .Values.config.autopurge.purgeInterval (eq (.Values.config.autopurge.purgeInterval | quote) (0 | quote)) }}
+    # Purge task interval in hours
+    # Set to "0" to disable auto purge feature
+    autopurge.purgeInterval={{ .Values.config.autopurge.purgeInterval }}
+{{- end }}
+{{ end }}
+{{ if .Values.config.metricsProvider }}
+    ## Metrics Providers
+    #
+    # https://prometheus.io Metrics Exporter
+{{- with .Values.config.metricsProvider }}
+{{- if .className }}
+    metricsProvider.className={{ .className }}
+{{- end }}
+{{- if .httpPort }}
+    metricsProvider.httpPort={{ .httpPort }}
+{{- end }}
+{{- if or .exportJvmInfo (eq (.exportJvmInfo | quote) (false | quote) ) }}
+    metricsProvider.exportJvmInfo={{ .exportJvmInfo }}
+{{- end }}
+{{- end -}}
+
+{{- end }}
+{{- $values := . -}}
+{{- range untilStep 0 (int .Values.replicaCount) 1 }}
+    server.{{.}}={{ template "serviceName" $values }}.{{ template "serviceName" $values }}-{{ . }}:2888:3888
+{{- end -}}
