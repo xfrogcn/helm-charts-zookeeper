@@ -12,4 +12,7 @@ RUN wget https://downloads.apache.org/zookeeper/zookeeper-${ZK_VERSION}/apache-z
 
 WORKDIR /opt/apache-zookeeper-${ZK_VERSION}-bin/bin
 
-ENTRYPOINT [ "bash", "./zkServer.sh", "start-foreground" ]
+COPY ./init.sh init.sh
+RUN chmod +x ./init.sh
+
+ENTRYPOINT [ "bash", "./init.sh", "&&", "./zkServer.sh", "start-foreground" ]
