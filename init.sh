@@ -7,7 +7,7 @@ else
     if [ ! -d "$ZOOKEEPER_DATA_DIR" ]; then
       mkdir -p "$ZOOKEEPER_DATA_DIR"
     fi
-    echo ${num+1}
-    echo ${num+1}>${ZOOKEEPER_DATA_DIR}/myid
+    echo $[$num+1]
+    echo $[$num+1]>${ZOOKEEPER_DATA_DIR}/myid
     exit
 fi
