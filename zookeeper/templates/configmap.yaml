@@ -18,6 +18,7 @@ data:
     clientPort={{.Values.config.clientPort}}
     electionPort=3888
     serverPort=2888
+    # 必须设置为true，监听所有IP地址
     quorumListenOnAllIPs=true
 {{- if .Values.config.maxClientCnxns }}
     # the maximum number of client connections.
