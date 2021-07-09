@@ -15,4 +15,4 @@ WORKDIR /opt/apache-zookeeper-${ZK_VERSION}-bin/bin
 COPY ./init.sh init.sh
 RUN chmod +x ./init.sh
 
-ENTRYPOINT [ "bash", "./init.sh", "&&", "./zkServer.sh", "start-foreground" ]
+CMD sh -c './init.sh && ./zkServer.sh start-foreground'

@@ -5,6 +5,7 @@ config:
   syncLimit: 5
   clientPort: 2181
   maxClientCnxns: 60
+  dataDir: /tmp/zookeeper
   # autopurge:
   #   snapRetainCount: 3
   #   purgeInterval: 0
@@ -15,7 +16,7 @@ config:
 
 # 副本数量
 replicaCount: 3
-# podManagementPolicy: OrderedReady
+podManagementPolicy: Parallel
 image: registry.cn-shenzhen.aliyuncs.com/xkj-jx/zookeeper:3.7.0
 imagePullPolicy: Always
 # 资源限制

@@ -13,7 +13,7 @@ spec:
   selector:
     matchLabels:
       app: {{ template "fullname" . }}
-  serviceName: {{ if .Values.serviceName -}} {{ .serviceName }} {{- else -}} {{ template "fullname" . }} {{- end }}
+  serviceName: {{ template "serviceName" . }}
   template:
     metadata:
 {{- if .Values.podAnnotations }}
@@ -29,6 +29,8 @@ spec:
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         name: {{ template "fullname" . }}
         env:
+        - name: ZOOKEEPER_DATA_DIR
+          value: {{ .Values.config.dataDir | quote }}
 {{- range $pkey, $pval := .Values.env }}
         - name: {{ $pkey }}
           value: {{ quote $pval }}
@@ -66,9 +68,6 @@ spec:
       volumes:
       - configMap:
           defaultMode: 256
-          items:
-          - key: zoo.cfg
-            path: zoo.cfg
           name: {{ template "fullname" . }}-configmap
           optional: false
         name: config
