@@ -60,6 +60,10 @@ spec:
         volumeMounts:
         - mountPath: {{ .Values.config.path }}
           name: config
+{{- if  eq (.Values.storage.enabled | quote) (true | quote) }}
+        - name: zk-data
+          mountPath: .Values.config.dataDir
+{{- end}}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -73,3 +77,16 @@ spec:
         name: config
   updateStrategy:
     type: RollingUpdate
+{{- if  eq (.Values.storage.enabled | quote) (true | quote) }}
+  volumeClaimTemplates:
+  - metadata:
+      name: zk-data
+    spec: 
+      accessModes: [ "ReadWriteOnce" ] 
+      {{- if .Values.storage.storageClassName }}
+      storageClassName: {{ .Values.storage.storageClassName }} #绑定pv名字为nfs
+      {{- end}}
+      resources:
+        requests:
+          storage: {{ .Values.storage.size }}
+{{- end }}

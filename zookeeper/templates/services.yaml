@@ -4,6 +4,7 @@ metadata:
   name: {{ template "serviceName" . }}
   labels:
     app: {{ template "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 spec:
   ports:
   - port: 2888
@@ -13,3 +14,20 @@ spec:
   clusterIP: None
   selector:
     app: {{ template "fullname" . }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "serviceName" . }}-svc
+  labels:
+    app: {{ template "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+spec:
+  ports:
+  - name: tcp-client
+    port: {{ .Values.config.clientPort }}
+    protocol: TCP
+    targetPort: {{ .Values.config.clientPort }}
+  selector:
+    app: {{ template "fullname" . }}
+  type: {{ .Values.service.type }}

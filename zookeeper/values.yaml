@@ -30,3 +30,11 @@ imagePullPolicy: Always
 
 # 名称，默认为zookeeper
 # nameOverride: zookeeper
+
+service:
+  type: NodePort
+
+storage:
+  enabled: true
+  storageClassName: ""
+  size: 1Gi
