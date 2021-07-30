@@ -14,12 +14,14 @@ data:
     syncLimit={{.Values.config.syncLimit}}
     # the directory where the snapshot is stored.
     dataDir={{ .Values.config.dataDir }}
+{{- if .Values.config.dataLogDir }}
+    dataLogDir={{ .Values.config.dataLogDir }}
+{{- end }}
     # the port at which the clients will connect
     clientPort={{.Values.config.clientPort}}
-    electionPort=3888
-    serverPort=2888
     # 必须设置为true，监听所有IP地址
     quorumListenOnAllIPs=true
+    4lw.commands.whitelist={{ .Values.config.commands_whitelist }}
 {{- if .Values.config.maxClientCnxns }}
     # the maximum number of client connections.
     # increase this if you need to handle more clients

@@ -1,11 +1,13 @@
 config:
   path: /opt/apache-zookeeper-3.7.0-bin/conf
-  tickTime: 2000
-  initLimit: 10
-  syncLimit: 5
+  tickTime: 3000
+  initLimit: 10  # tickTIme的倍数
+  syncLimit: 5 # tickTIme的倍数
   clientPort: 2181
-  maxClientCnxns: 60
+  maxClientCnxns: 60 # 单个客户端对单个ZK服务器的连接数限制，如果为0则不限制
   dataDir: /tmp/zookeeper
+  commands_whitelist: "*"
+  # dataLogDir: 
   # autopurge:
   #   snapRetainCount: 3
   #   purgeInterval: 0
@@ -38,3 +40,8 @@ storage:
   enabled: true
   storageClassName: ""
   size: 1Gi
+
+  logStorage:
+    enabled: false
+    storageClassName: ""
+    size: 1Gi
